@@ -1,0 +1,20 @@
+services:
+  # O Banco de Dados - Onde guardamos o histórico de preços
+  db:
+    image: postgres:15-alpine
+    container_name: vprice_db
+    restart: always
+    environment:
+      POSTGRES_USER: vicius
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Vamos por isto no .env
+      POSTGRES_DB: vprice_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Futuramente aqui entram o 'backend' e 'frontend' quando fizermos deploy final
+  # Por enquanto, rodamos eles 'fora' do Docker para desenvolveres rápido.
+
+volumes:
+  postgres_data:
