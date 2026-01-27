@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Scan {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  title     String?
+  rawText   String
+  
+  fairPrice Float
+  listingPrice Float?
+  verdict   String
+  category  String
+  
+  componentsJson String
+}
