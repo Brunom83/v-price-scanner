@@ -62,6 +62,11 @@ async def extract_hardware_data(text_input: str):
        - Abaixo de 80%: Desvaloriza MUITO (aplica o custo de uma bateria nova, ~80€, no preço usado).
     3. Se não encontrares a %, assume "Desconhecido" mas avisa que é arriscado.
 
+    REGRAS CRÍTICAS PARA RAM:
+    1. Procura ativamente por configurações de pentes: "2x8GB", "4x4GB", "1x16GB", "Dual Channel", "Quad Channel".
+    2. Se encontrares apenas "16GB" sem detalhes de pentes, assume o cenário mais comum (geralmente 2x8GB em desktops gamer, 1x16GB em laptops baratos), mas adiciona "(Verificar Fotos)" no nome.
+    3. Se o texto mencionar explicitamente a quantidade de pentes (ex: "tem 4 pentes"), usa isso para calcular.
+
     TAREFAS:
     1. Classifica o tipo: "Desktop", "Laptop" ou "Smartphone".
     2. Identifica componentes (CPU, GPU, RAM, Ecrã, Bateria, etc.).
@@ -70,7 +75,7 @@ async def extract_hardware_data(text_input: str):
     RESPOSTA JSON OBRIGATÓRIA:
     {{
          "category": "Desktop/Laptop/Smartphone",
-         "cpu": "...", "gpu": "...", "ram": "...", "storage": "...",
+         "cpu": "...", "gpu": "...", "ram": "Ex: 16GB (2x8GB) DDR4", "storage": "...",
          "condition": "Usado",
          "battery_health": 87 (ou null se não for telemóvel/laptop ou não disser),
          "battery_verdict": "Bom/Aceitável/Mau - Precisa Trocar",

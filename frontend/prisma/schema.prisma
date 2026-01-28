@@ -12,7 +12,8 @@ model Scan {
   createdAt DateTime @default(now())
   
   title     String?
-  rawText   String
+  rawText   String   // O que o utilizador escreveu
+  productUrl String? // <--- NOVO: O Link clicável (pode ser nulo)
   
   fairPrice Float
   listingPrice Float?

@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+playwright
+groq
+python-dotenv
+psycopg2-binary
+asyncpg

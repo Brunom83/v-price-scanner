@@ -1,20 +1,51 @@
 services:
-  # O Banco de Dados - Onde guardamos o histórico de preços
+  # 1. Base de Dados (Já conheces)
   db:
     image: postgres:15-alpine
     container_name: vprice_db
     restart: always
     environment:
-      POSTGRES_USER: vicius
-      POSTGRES_PASSWORD: ${DB_PASSWORD} # Vamos por isto no .env
-      POSTGRES_DB: vprice_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  # Futuramente aqui entram o 'backend' e 'frontend' quando fizermos deploy final
-  # Por enquanto, rodamos eles 'fora' do Docker para desenvolveres rápido.
+  # 2. Backend (Python + IA)
+  backend:
+    build: ./backend
+    container_name: vprice_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      # Acesso à DB dentro da rede Docker (nome do serviço: "db")
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # 3. Frontend (Next.js Dashboard)
+  frontend:
+    build: ./frontend
+    container_name: vprice_frontend
+    restart: always
+    ports:
+      - "3012:3000"
+    environment:
+      # URL da DB para o Prisma (dentro do Docker)
+      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?schema=public
+    depends_on:
+      - backend
+      - db
 
 volumes:
   postgres_data:
